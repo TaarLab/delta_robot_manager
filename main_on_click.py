@@ -6,8 +6,8 @@ from delta_manager.delta_manager import DeltaManager
 
 def click_event(event, u, v, flags, params):
     if event == cv2.EVENT_LBUTTONDOWN:
-        print(f'Pixel: ({u}, {v})')
-
+        print(f'Clicked pixel: ({u}, {v})')
+    
         z_fom = 2
         z_obj = 1.9
         
@@ -21,8 +21,8 @@ def click_event(event, u, v, flags, params):
         z -= z_obj
         print(f'Robot: ({x:.2f}, {y:.2f}, {z:.2f})')
 
-        Delta.move_with_time(x, y, z+10, 3)
-        Delta.move_with_time(x, y, z, 3)
+        Delta.move(x, y, z+10)
+        Delta.move(x, y, z)
 
 
 Delta = DeltaManager()
@@ -64,15 +64,17 @@ while True:
     elif key_pressed == ord('o'):
         Delta.open_gripper()
     elif key_pressed == ord('l'):
-        Delta.open_gripper_aBit()
+        Delta.open_gripper_slightly()
     elif key_pressed == ord('c'):
         Delta.close_gripper()
     elif key_pressed == ord('h'): 
         Delta.go_home()
     elif key_pressed == ord('e'): 
-        Delta.rotate_gripper(-45)
+        Delta.rotate_gripper(-90)
     elif key_pressed == ord('q'): 
-        Delta.rotate_gripper(45)
+        Delta.rotate_gripper(90)
+    elif key_pressed == ord('s'):
+        Delta.delta_stop_server()
 
 
 cap.release()
