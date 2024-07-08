@@ -19,7 +19,24 @@ Delta = DeltaManager()
 ```
 Delta.connect_gripper()
 ```
-## Gripper functions:
+## Gripper functions (using server):
+### Gripper open:
+```
+Delta.delta_open_gripper()
+```
+### Gripper close:
+```
+Delta.delta_close_gripper()
+```
+### Gripper rotation
+```
+Delta.delta_rotate_gripper(angle)
+```
+> [!NOTE]
+> Angle in degree -90:90 (it is relative to the current angle)
+
+## Gripper functions (using cable):
+
 ### Gripper open:
 ```
 Delta.open_gripper()
@@ -32,7 +49,7 @@ Delta.open_gripper_aBit()
 ```
 Delta.close_gripper()
 ```
-### Gripper close with feedback:
+### Gripper closes with feedback:
 ```
 Delta.close_gripper_with_feedback()
 ```
@@ -51,7 +68,7 @@ Delta.rotate_gripper(angle):
 Delta.force_gripper(force):
 ```
 >[!NOTE]
-> int from 1 to 5000 uncomment it from delta_manager.py and ask Navid Asadi if you want to use.
+> int from 1 to 5000 uncomment it from delta_manager.py and ask Navid Asadi if you want to use it.
 
 ### Gripper wait:
 ```
@@ -59,25 +76,31 @@ Delta.wait_till_done()
 ```
 # Delta Parallel Robot(DPR) functions:
 >[!NOTE]
-> Connect to Taarlabs WIFI
+> Connect to Taarlabs WIFI/ Use Delta robot's GUI/ Enable it/ REMOVE BARS and put it in server mode.
 
+>[!Caution]
+> BY ENABLING THE ROBOT EACH ARM MUST GO UP TO HIT FRAME AND THEN THEY'LL GO BACK TO REACH ITS HOMING POSITION.
+> DON'T FORGET TO REMOVE BARS AFTER HOMING PROCEDURE!!!!!!!!!!! 
 ### Delta home:
 ```
 Delta.go_home()
 ```
+> [!NOTE]
+> Preset position of x:0, y:0, z:-37
+
 ### Delta move:
 ```
 Delta.move(x, y, z)
 ```
 >[!NOTE]
->Moves in 8 seconds
+>Moves in 5 seconds
 
 ### Delta move with the given time:
 ```
 Delta.move_with_time(x, y, z, t)
 ```
 >[!WARNING]
-> Don't use times less than 3 seconds ask Navid Pasiar or Arvin Mohammadi if you want.
+> Don't use times less than 2 seconds ask Navid Pasiar or Arvin Mohammadi if you want.
 
 ### Delta wait till done:
 ```
@@ -91,18 +114,9 @@ x,y,z = Delta.read_forward()
 ```
 Delta.delta_stop_server()
 ```
-
 # To use camera coordinates to move Delta follow these instructions:
->[!IMPORTANT]
-> Move the robot to (0,0,-37)
->
-## To correct robots homming Error run set_homming_offset.py, click on the corner of the grid on the robots base.
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="Images/Calibration_offset_correction.jpg">
-  <source media="(prefers-color-scheme: light)" srcset="Images/Calibration_offset_correction.jpg">
-  <img alt="Shows an illustrated sun in light mode and a moon with stars in dark mode." src="Images/Calibration_offset_correction.jpg">
-</picture>
-
+>[!NOTE]
+> Move the robot to (0,0,-37) (you can capture images and get coordinates wherever you want.)
 
 ## Import these libraries
 ```
@@ -111,14 +125,21 @@ import numpy as np
 import delta_manager.camera as Camera
 from delta_manager.delta_manager import DeltaManager
 ```
-## Get video input from DPRs camera
+## Get video input from DPR's camera
 ```
 cap = cv2.VideoCapture(2, cv2.CAP_DSHOW)
+
+WIDTH = 4000
+HEIGHT = 4000
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
 
 while True:
     _, frame = cap.read()
 
     # Undistort the frame
+  # DON'T miss this part!!!!!!!!
     frame = Camera.undistort(frame)    
 ```
 ## To convert (U, V) pixel coordinates to (X, Y, Z) Delta Parallel Robot use:
@@ -132,12 +153,11 @@ z_obj = 1.9 # Put your objects height here
 
 [x, y, z] = Camera.pixel_to_robot_coordinates(
     (u, v), 
-    camera_height=48.8,
     z_obj = z_fom + z_obj, 
     gripper='2f85',
     robot_capturing_coord=np.array(Delta.read_forward())
 )
-z -= z_obj # if the height of your objects is short
+z -= (z_obj/2) # if the height of your objects is short
 # else z -= 2 or 3 cm
 
 ```
