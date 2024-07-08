@@ -1,7 +1,7 @@
 import time
 import serial
 import serial.tools.list_ports as port_list
-import delta_manager.camera as Camera
+# import delta_manager.camera as Camera
 import delta_manager.client as Client
 
 
@@ -16,12 +16,14 @@ class DeltaManager():
         self.gripper = None
         available_ports = self.get_all_ports()
         for port in available_ports:
-            if 'COM' in self.get_port_name(port) or 'ttyACM' in self.get_port_name(port):  #TODO: check if this works on linux
-                self.gripper = serial.Serial(
-                    self.get_port_name(port), 
-                    self.SERIAL_BAUD_RATE, 
-                    timeout=None
-                )    
+            port_name = self.get_port_name(port)
+            if 'COM' in port_name or 'ttyACM' in port_name:  #TODO: check if this works on linux
+                if 'CH340' in self.get_description(port):
+                    self.gripper = serial.Serial(
+                        port_name, 
+                        self.SERIAL_BAUD_RATE, 
+                        timeout=None
+                    )    
         
         if self.gripper:
             self.gripper.write(f"\r\n".encode("utf-8"))
@@ -50,7 +52,7 @@ class DeltaManager():
     def close_gripper(self, ):
         self.gripper.write(f"g".encode("utf-8"))
         self.gripper.reset_input_buffer()
-        self.wait_till_done_gripper()
+        # self.wait_till_done_gripper()
         print("closing gripper")
 
     def close_gripper_with_feedback(self, ):

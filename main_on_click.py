@@ -8,17 +8,20 @@ def click_event(event, u, v, flags, params):
     if event == cv2.EVENT_LBUTTONDOWN:
         print(f'Pixel: ({u}, {v})')
 
-        z_fom = 2
-        z_obj = 1.9
+        z_fom = 0
+        z_obj = 0
         
+
         [x, y, z] = Camera.pixel_to_robot_coordinates(
             (u, v), 
-            camera_height=50,
             z_obj=z_fom+z_obj, 
-            gripper='2f85',
+            gripper='pichgooshti',
             robot_capturing_coord=np.array(Delta.read_forward())
         )
-        z -= z_obj
+        z -= (z_obj/2)
+        #for safty
+        # z += 5
+
         print(f'Robot: ({x:.2f}, {y:.2f}, {z:.2f})')
 
         Delta.move_with_time(x, y, z+10, 3)
@@ -28,7 +31,18 @@ def click_event(event, u, v, flags, params):
 Delta = DeltaManager()
 Delta.connect_gripper()
 
-cap = cv2.VideoCapture(2, cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+
+WIDTH = 4000
+HEIGHT = 4000
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
+
+
+width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+print([width,height])
 
 image_counter = 0
 
@@ -39,8 +53,8 @@ while True:
     frame = Camera.undistort(frame)
     
     # Image show
-    cv2.namedWindow('image', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('image', 800, 600)
+    cv2.namedWindow('image')
+    # cv2.resizeWindow('image', 800, 600)
     cv2.setMouseCallback('image', click_event)
     cv2.imshow('image', frame)
 
