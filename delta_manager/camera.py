@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 
+def calculate_transformation_matrix(max_z_end_effector, z_obj, robot_capturing_coord):
+    values_tr00, values_tr01, values_tr10, values_tr11, values_off0, values_off1 = np.load('values.npy')
+    total_height_robot = 86.7
 
 def calculate_transformation_matrix(max_z_end_effector, z_obj, robot_capturing_coord):
     values_tr00, values_tr01, values_tr10, values_tr11, values_off0, values_off1 = np.load('./delta_manager/parameters/values.npy')
@@ -9,7 +12,6 @@ def calculate_transformation_matrix(max_z_end_effector, z_obj, robot_capturing_c
     H = total_height_robot - z_obj + robot_capturing_coord[2] 
     robot_capturing_coord_copy = robot_capturing_coord.copy()
     robot_capturing_coord_copy[2] = 0
-    print("H:",H)
 
     p00, p01, p10, p11 = np.poly1d(values_tr00), np.poly1d(values_tr01), np.poly1d(values_tr10), np.poly1d(values_tr11)
     tr_matrix = np.array([[p00(H), p01(H), 0], [p10(H), p11(H), 0], [0, 0, 0]])
@@ -37,6 +39,7 @@ def pixel_to_robot_coordinates(pixel, z_obj=0, gripper='2f85', robot_capturing_c
     robot_coordinates = np.dot(pixel_coord, tr_matrix) + offset_matrix
 
     return robot_coordinates
+
 
 def robot_coordinates_to_pixel(robot_coordinates, camera_height=50, z_obj=0, gripper='2f85', robot_capturing_coord=np.array([0,0,-37]), offset_valid=True):
 

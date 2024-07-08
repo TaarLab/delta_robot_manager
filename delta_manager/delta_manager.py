@@ -39,6 +39,9 @@ class DeltaManager():
     def get_port_name(self, port):
         return port[0]
     
+    def get_description(self, port):
+        return port[1]
+    
     def open_gripper(self, ):
         self.gripper.write(f"h".encode("utf-8"))
         # self.wait_till_done_gripper()
