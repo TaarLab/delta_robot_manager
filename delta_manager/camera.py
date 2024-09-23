@@ -3,9 +3,9 @@ import numpy as np
 
 def calculate_transformation_matrix(max_z_end_effector, z_obj, robot_capturing_coord):
     values_tr00, values_tr01, values_tr10, values_tr11, values_off0, values_off1, values_H = np.load('./delta_manager/parameters/values.npy')
-    total_height_robot = 86.7
     p_H = np.poly1d(values_H)
 
+    # total_height_robot = 86.7
     # H = total_height_robot - z_obj + robot_capturing_coord[2] 
     H = p_H(robot_capturing_coord[2]) - z_obj
     robot_capturing_coord_copy = robot_capturing_coord.copy()
@@ -22,7 +22,7 @@ def calculate_transformation_matrix(max_z_end_effector, z_obj, robot_capturing_c
 def pixel_to_robot_coordinates(pixel, z_obj=0, gripper='2f85', robot_capturing_coord=np.array([0,0,-37])):
     
     if gripper == '2f85':
-        max_z_end_effector = -65.75
+        max_z_end_effector = -65.5
     elif gripper == 'Ehand':
         max_z_end_effector = -68
     elif gripper == 'pichgooshti':
@@ -43,7 +43,7 @@ def robot_coordinates_to_pixel(robot_coordinates, camera_height=50, z_obj=0, gri
 
     default_robot_height = 37
     if gripper == '2f85':
-        max_z_end_effector = 65.75
+        max_z_end_effector = 65.5
     elif gripper == 'Ehand':
         max_z_end_effector = 68
     else:
