@@ -2,13 +2,9 @@ import cv2
 import numpy as np
 
 def calculate_transformation_matrix(max_z_end_effector, z_obj, robot_capturing_coord):
-    values_tr00, values_tr01, values_tr10, values_tr11, values_off0, values_off1, _ = np.load('values.npy')
+    values_tr00, values_tr01, values_tr10, values_tr11, values_off0, values_off1, values_H = np.load('./delta_manager/parameters/values.npy')
     total_height_robot = 86.7
-
-def calculate_transformation_matrix(max_z_end_effector, z_obj, robot_capturing_coord):
-    values_tr00, values_tr01, values_tr10, values_tr11, values_off0, values_off1, Values_H = np.load('./delta_manager/parameters/values.npy')
-    total_height_robot = 86.7
-    p_H = np.poly1d(Values_H)
+    p_H = np.poly1d(values_H)
 
     # H = total_height_robot - z_obj + robot_capturing_coord[2] 
     H = p_H(robot_capturing_coord[2]) - z_obj
