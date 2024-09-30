@@ -3,7 +3,7 @@ import socket
 import selectors
 import traceback
 
-from config import IP, PORT
+from delta_manager.config import IP, PORT
 
 #client
 
