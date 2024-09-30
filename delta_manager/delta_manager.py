@@ -137,26 +137,3 @@ class DeltaManager():
     def delta_close_gripper(self, ):
         Client.order("command", "closegripper")
         print('Delta is now offline...')
-
-    def delta_gripper_wiggle(ang, t = 0.02, rep = 5):
-        Delta.rotate_gripper(int(ang/2))
-        time.sleep(t)
-        for _ in range(rep):
-            Delta.rotate_gripper(int(-ang))
-            time.sleep(t)
-            Delta.rotate_gripper(int(ang))
-            time.sleep(t)
-        Delta.rotate_gripper(int(-ang/2))
-        time.sleep(t)
-
-
-    def gripper_wiggle(ang, t = 0.02, rep = 5):
-        rotate_gripper(int(ang/2))
-        time.sleep(t)
-        for _ in range(rep):
-            rotate_gripper(int(-ang))
-            time.sleep(t)
-            rotate_gripper(int(ang))
-            time.sleep(t)
-        rotate_gripper(int(-ang/2))
-        time.sleep(t)
