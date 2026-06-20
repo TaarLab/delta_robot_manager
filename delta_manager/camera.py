@@ -5,8 +5,6 @@ def calculate_transformation_matrix(max_z_end_effector, z_obj, robot_capturing_c
     values_tr00, values_tr01, values_tr10, values_tr11, values_off0, values_off1, values_H = np.load('./delta_manager/parameters/values.npy')
     p_H = np.poly1d(values_H)
 
-    # total_height_robot = 86.7
-    # H = total_height_robot - z_obj + robot_capturing_coord[2] 
     H = p_H(robot_capturing_coord[2]) - z_obj
     robot_capturing_coord_copy = robot_capturing_coord.copy()
     robot_capturing_coord_copy[2] = 0
@@ -19,16 +17,12 @@ def calculate_transformation_matrix(max_z_end_effector, z_obj, robot_capturing_c
     return tr_matrix, offset_matrix
 
 
-def pixel_to_robot_coordinates(pixel, z_obj=0, gripper='2f85', robot_capturing_coord=np.array([0,0,-37])):
+def pixel_to_robot_coordinates(pixel, z_obj=0, gripper='New_Hand', robot_capturing_coord=np.array([0,0,-37])):
     
-    if gripper == '2f85':
-        max_z_end_effector = -65.5
-    elif gripper == 'Ehand':
-        max_z_end_effector = -68
-    elif gripper == 'pichgooshti':
-        max_z_end_effector = -66
+    if gripper == 'New_Hand':
+        max_z_end_effector = -61
     else:
-        raise Exception('Invalid gripper type')
+        raise Exception('Invalid gripper type (Use "New_Hand")')
         
     pixel_coord = [pixel[0],pixel[1],0]
 
@@ -39,15 +33,13 @@ def pixel_to_robot_coordinates(pixel, z_obj=0, gripper='2f85', robot_capturing_c
     return robot_coordinates
 
 
-def robot_coordinates_to_pixel(robot_coordinates, camera_height=50, z_obj=0, gripper='2f85', robot_capturing_coord=np.array([0,0,-37]), offset_valid=True):
+def robot_coordinates_to_pixel(robot_coordinates, camera_height=50, z_obj=0, gripper='New_Hand', robot_capturing_coord=np.array([0,0,-37]), offset_valid=True):
 
-    default_robot_height = 37
-    if gripper == '2f85':
-        max_z_end_effector = 65.5
-    elif gripper == 'Ehand':
-        max_z_end_effector = 68
+    default_robot_height = -37
+    if gripper == 'New_Hand':
+        max_z_end_effector = -61
     else:
-        raise Exception('Invalid gripper type')
+        raise Exception('Invalid gripper type (Use "New_Hand")')
         
 
     if offset_valid:
