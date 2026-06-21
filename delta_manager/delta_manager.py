@@ -6,13 +6,13 @@ import delta_manager.client as Client
 
 
 class DeltaManager():
-    SERIAL_BAUD_RATE = 38400
-
+    SERIAL_BAUD_RATE = 1000000  # Updated from 38400 for the new gripper
+    
     def __init__(self, debug_mode=False):
         self.DEBUG_MODE = debug_mode
         # Initialize current position for debug mode
         self.current_position = [0, 0, -37]  # Start at home position
-        self.current_gripper_angle = 0  # Track gripper angle
+        self.current_gripper_angle = [0, 90, 180]  # Track gripper angle
 
     ## Gripper functions
     def connect_gripper(self, ):
@@ -60,7 +60,7 @@ class DeltaManager():
         if self.DEBUG_MODE:
             print("[DEBUG] opening gripper")
         else:
-            self.gripper.write(f"h".encode("utf-8"))
+            self.gripper.write("cg1\n".encode("utf-8"))
             # self.wait_till_done_gripper()
             print("opening gripper")
 
@@ -68,7 +68,8 @@ class DeltaManager():
         if self.DEBUG_MODE:
             print("[DEBUG] opening gripper a little bit")
         else:
-            self.gripper.write(f"o".encode("utf-8"))
+            self.gripper.write("cg2\n".encode("utf-8"))
+            self.gripper.reset_input_buffer()
             # self.wait_till_done_gripper()
             print("opening gripper a little bit")
 
@@ -76,7 +77,7 @@ class DeltaManager():
         if self.DEBUG_MODE:
             print("[DEBUG] closing gripper")
         else:
-            self.gripper.write(f"g".encode("utf-8"))
+            self.gripper.write("cg2\n".encode("utf-8"))
             self.gripper.reset_input_buffer()
             # self.wait_till_done_gripper()
             print("closing gripper")
@@ -93,24 +94,28 @@ class DeltaManager():
             self.gripper.reset_input_buffer()
             result = self.wait_till_done_gripper(wait_for_failed=True)
             return result
-
-    def rotate_gripper(self, angle):
-        # on degree -90:90 (its ralative to the current angle)
+            
+    def rotate_gripper(self, x=0, y=90, z=180):
         if self.DEBUG_MODE:
-            self.current_gripper_angle += int(angle)
-            print(f"[DEBUG] rotate gripper to {angle} degrees")
-            return
+            self.current_gripper_angle = [x, y, z]
+            print(f"[DEBUG] rotate gripper to X:{x} Y:{y} Z:{z}")
         else:
-            angle = int(angle)
-            self.gripper.write(f"r{angle}".encode("utf-8"))
-            # self.wait_till_done_gripper()
-            print(f"rotating gripper to {angle} degrees")
+            command = f"cr{x}-{y}-{z}\n"
+            self.gripper.write(command.encode("utf-8"))
+            print(f"rotating gripper to X:{x} Y:{y} Z:{z}")
+            
+    def home_rotation(self):
+        """Quick helper to send the default cr0-90-180 homing command"""
+        self.rotate_gripper(0, 90, 180)
 
-    def force_gripper(self, force):
-        # int from 1 to 5000
-        # self.gripper.write(f"f{int(force)}".encode("utf-8"))
-        # self.wait_till_done_gripper()
-        print(f"setting gripper force to {force}")
+    def force_gripper(self, real_fz, desired_fz, f_x):
+        if self.DEBUG_MODE:
+            print(f"[DEBUG] setting gripper force: real_fz={real_fz}, desired_fz={desired_fz}, f_x={f_x}")
+        else:
+            # Matches the f{real_fz}-{desired_fz}-{f_x} 
+            command = f"f{real_fz:.2f}-{desired_fz:.2f}-{f_x:.2f}\n"
+            self.gripper.write(command.encode("utf-8"))
+            print(f"setting gripper force target to {desired_fz}N")
     
     def wait_till_done_gripper(self, wait_for_failed=False):
         if self.DEBUG_MODE:
